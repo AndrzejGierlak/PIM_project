@@ -1,53 +1,15 @@
 // TODO Implement this library.
 // TODO https://flutter.dev/docs/cookbook/navigation/navigation-basics
 import 'package:flutter/material.dart';
+import 'package:pim_core_app/record_list.dart';
 import 'package:pim_core_app/task_list.dart';
 import 'package:pim_core_app/task_statistics.dart';
 import 'package:pim_core_app/help.dart';
 import 'package:pim_core_app/home_page.dart';
-import 'package:pim_core_app/task_edition.dart';
+import 'package:pim_core_app/record_edit.dart';
 import 'package:pim_core_app/task_new.dart';
+import 'package:pim_core_app/record_new.dart';
 
-class FirstRoute extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('First Route'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          child: Text('Open route'),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => SecondRoute()),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class SecondRoute extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Second Route"),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text('Go back!'),
-        ),
-      ),
-    );
-  }
-}
 
 class MenuRoute extends StatelessWidget {
   @override
@@ -72,11 +34,11 @@ class MenuRoute extends StatelessWidget {
               },
             ),
             ElevatedButton(
-              child: Text('Open TaskEdition'),
+              child: Text('Open Task Record'),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => TaskEditionRoute()),
+                  MaterialPageRoute(builder: (context) => RecordEditRoute()),
                 );
               },
             ),
@@ -90,11 +52,29 @@ class MenuRoute extends StatelessWidget {
               },
             ),
             ElevatedButton(
-              child: Text('Open TaskList'),
+              child: Text('Open RecordNew'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RecordNewRoute()),
+                );
+              },
+            ),
+            ElevatedButton(
+              child: Text('Open TaskList',style: TextStyle(color: Colors.red.withOpacity(1.0)),),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => TaskListRoute()),
+                );
+              },
+            ),
+            ElevatedButton(
+              child: Text('Record List direct view'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TaskRecordListRoute()),
                 );
               },
             ),

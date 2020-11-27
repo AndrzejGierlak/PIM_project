@@ -4,17 +4,23 @@ import 'package:flutter/material.dart';
 class HelpRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    const infoString="Working Hours 2.0 \n"
+        "Autorzy: Wojtek Śliwa, Andrzej Gierlak\n"
+        "Więcej info...\n"
+        "...\n";
     return Scaffold(
       appBar: AppBar(
-        title: Text("Help/INFO"),
+        title: Text("Pomoc/Informacja"),
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text('Go back!'),
-        ),
+      body: const Center(
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Text(
+              infoString,
+              style: TextStyle(fontSize: 24),
+            ),
+          )
+
       ),
     );
   }
