@@ -1,6 +1,3 @@
-
-
-
 //TODO stworzyć listę poszczególnych rekordów, wzorując się na task_list
 //TODO trzeba ustlic wlasny format recordu
 //TODO do listy trzeba dostawac się po identyfikatorze taska
@@ -8,23 +5,24 @@
 
 //TODO to ponizej jest w większości do wywalenia
 
-
 //TODO lista nazw tasków- ską będzie można przejść do edycji każdego taska
 
 import 'package:flutter/material.dart';
-import 'package:pim_core_app/help.dart';
-import 'package:pim_core_app/record_edit.dart';
+import 'help.dart';
+import 'menu_drawer.dart';
+import 'record_edit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class TaskRecordListRoute extends StatelessWidget {
   //ponizsze wymaga task id przy tworzeniu
   final String parentTaskId;
-  TaskRecordListRoute({Key key, @required this.parentTaskId}): super(key:key);
+  TaskRecordListRoute({Key key, @required this.parentTaskId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: MenuDrawer(),
       appBar: AppBar(
         title: Text("Record list (of specified task)"),
       ),
@@ -33,23 +31,20 @@ class TaskRecordListRoute extends StatelessWidget {
   }
 }
 
-
 class RecordListWidget extends StatefulWidget {
-
   final String parentTaskId;
-  RecordListWidget({Key key, @required this.parentTaskId}): super(key:key);
+  RecordListWidget({Key key, @required this.parentTaskId}) : super(key: key);
 
   @override
-  _RecordListWidgetState createState() => _RecordListWidgetState(parentTaskId: this.parentTaskId);
+  _RecordListWidgetState createState() =>
+      _RecordListWidgetState(parentTaskId: this.parentTaskId);
 }
 
 class _RecordListWidgetState extends State<RecordListWidget> {
-  //List<String> taskNameList = List<String>(); przestarzałe
-
   final String parentTaskId;
-  _RecordListWidgetState({Key key, @required this.parentTaskId}): super();
+  _RecordListWidgetState({Key key, @required this.parentTaskId}) : super();
 
-  List<Record> recordList= List<Record>();
+  List<Record> recordList = List<Record>();
   @override
   void initState() {
     super.initState();
@@ -60,12 +55,12 @@ class _RecordListWidgetState extends State<RecordListWidget> {
     // format klucza do zapisania rekordu: "task.id"+"task"+"klucz recordu(numer do tablicy)"
 
     //przykladowa inicjacja danych
-  //  initTestData('1','2','dzisiaj','30 minut','2'+'task'+'0');//TODO
-  //  initTestData('2','2','dwa tygodnie temu','14 dni','2'+'task'+'1');//TODO
-  //  initTestData('3','1','wczoraj','10 lat','0'+'task'+'0');//TODO
-  //  initTestData('4','2','pojutrze','30 minut','0'+'task'+'1');//TODO
-  //  initTestData('5','0','moze kiedys','14 dni','1'+'task'+'0');//TODO przy pim ma zostac tylko moze keidys->wtedy usuwanie dziala
-  //  initTestData('6','1','pewnie nigdy','10 lat','1'+'task'+'1');//TODO
+/*   initTestData('1','2','dzisiaj','30 minut','2'+'task'+'0');//TODO
+   initTestData('2','2','dwa tygodnie temu','14 dni','2'+'task'+'1');//TODO
+   initTestData('3','1','wczoraj','10 lat','0'+'task'+'0');//TODO
+   initTestData('4','2','pojutrze','30 minut','0'+'task'+'1');//TODO
+   initTestData('5','0','moze kiedys','14 dni','1'+'task'+'0');//TODO przy pim ma zostac tylko moze keidys->wtedy usuwanie dziala
+   initTestData('6','1','pewnie nigdy','10 lat','1'+'task'+'1');//TODO*/
     //TODO!!!!!! uwaga jest problem z indexami- obecnie mozna usuwac tylko najwiekszy index żeby dzialalo prawidlowo
     //TODO PRZYCZYNA: zaimplementowane jest wczytywanie wczytuj dopoki od 0 znajdujesz cos na danym kluczu
     // TODO pomysl na robienie-> po usuwaniu trzeba zapisac wszystkie elementy tablicy od poczatku(0) do konca
@@ -74,31 +69,58 @@ class _RecordListWidgetState extends State<RecordListWidget> {
     initialLoadFull();
   }
 
-
   //status: Zrobione, używane
   //poprawny load danych- wczytuj dopoki odczytujesz cos z pamieci
   //dane są odczytywane bezpośrednio w Liście
-  void initialLoadFull () async {
-    var i=0;
-    print("ParentTaskId is: "+parentTaskId);
-    Record temp=await getRecordInfoKey(parentTaskId+'task'+i.toString());//TODO zmien zahardcodowane 2 na parametr przekazany przy konstruktorze tego screena
-    while(temp!=null){
+  void initialLoadFull() async {
+    var i = 0;
+    print("ParentTaskId is: " + parentTaskId);
+    Record temp = await getRecordInfoKey(parentTaskId +
+        'task' +
+        i.toString()); //TODO zmien zahardcodowane 2 na parametr przekazany przy konstruktorze tego screena
+    while (temp != null) {
       print("wszedlem");
       recordList.add(temp);
-      i+=1;
-      temp=await getRecordInfoKey(parentTaskId+'task'+i.toString());
+      i += 1;
+      temp = await getRecordInfoKey(parentTaskId + 'task' + i.toString());
     }
-    setState(() {});//zeby odswiezyc- nie zapominac o tym bo inaczej widok się nie rerenderuje
+    setState(
+        () {}); //zeby odswiezyc- nie zapominac o tym bo inaczej widok się nie rerenderuje
   }
+
+/*  Widget _buildTaskList() {
+    return ListView.builder(
+      itemBuilder: (context, i) {
+        return _buildRow(recordList[i]);
+      },
+      itemCount: recordList.length,
+    );
+  }
+
+  Widget _buildRow(Record record) {
+    return Card(
+      child: ListTile(
+        leading: Icon(
+          Icons.brightness_1_rounded,
+          color: Color(record.getColor()),
+        ),
+        title: Text(record.getName(), style: TextStyle(fontSize: 18.0)),
+        onTap: () => {},
+        onLongPress: () => {},
+      ),
+    );
+  }*/
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: ListView.builder(itemBuilder: (context, index) {
-        physics: ClampingScrollPhysics();
-        return Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: GestureDetector(
+      child: ListView.builder(
+        itemBuilder: (context, index) {
+          physics:
+          ClampingScrollPhysics();
+          return Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: GestureDetector(
                 child: Container(
                   height: 30,
                   color: Colors.blue,
@@ -109,49 +131,50 @@ class _RecordListWidgetState extends State<RecordListWidget> {
                         child: Text(
                           //taskNameList[index], //przestarzale
                           recordList[index].getStartDate(),
-                          style: TextStyle(color: Colors.white ,fontSize: 18,),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
                         ),
-                      )
-                  ),
+                      )),
                 ),
                 //TODO tu zaimplementuj wyswietlanie danego recordu
-                onTap:()=>{
+                onTap: () => {
                   //print("Pushowany taskID to : "+taskList[index].getId()),
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => RecordEditRoute(passedRecord: recordList[index]),
+                      builder: (context) =>
+                          RecordEditRoute(passedRecord: recordList[index]),
                     ),
                   ),
                 },
-              onLongPress: ()=>{
+                onLongPress: () => {
                   //TODO przykład usuwania danych
-                 removeData(recordList[index].info.taskId,index.toString()),
-              //TODO https://stackoverflow.com/questions/52778601/flutter-remove-list-item
-                //TODO opis ponizszego- usun ten element z tablicy, ktorego id jest takie jak id kliknietej rzeczy
-                  recordList.removeWhere((item) => item.info.id == recordList[index].info.id),
-                  setState(() {})//zeby odswiezyc
-              },
-            )
-        );
-      },
+                  removeData(recordList[index].info.taskId, index.toString()),
+                  //TODO https://stackoverflow.com/questions/52778601/flutter-remove-list-item
+                  //TODO opis ponizszego- usun ten element z tablicy, ktorego id jest takie jak id kliknietej rzeczy
+                  recordList.removeWhere(
+                      (item) => item.info.id == recordList[index].info.id),
+                  setState(() {}) //zeby odswiezyc
+                },
+              ));
+        },
         itemCount: recordList.length,
       ),
     );
   }
-
 }
-
 
 //TODO (z)robione zapis i odczyt jsona--------------------------------------------------------------
 //to jest do zapisania formatu recordu pod kluczem howToMapRecord -w jaki sposób powinniśmy odczytywać dane
 Future<void> saveRecordInfo() async {
   final Record myRecord = Record.fromJson({
     'info': {
-      'id': '1',//record ID
-      'taskId':'1',
-      'startDate':'12:50:31',
-      'duration':'2'
+      'id': '1', //record ID
+      'taskId': '1',
+      'startDate': '12:50:31',
+      'duration': '2'
     },
     'token': 'xxx'
   });
@@ -162,13 +185,14 @@ Future<void> saveRecordInfo() async {
 
 //TODO to jest prototyp funkcji zapisującej- w odpowiednie miejsca przekazac id lub stworzyć funkcję na podstawie tej
 //TODO Prototyp funkcji READ
-Future<void> initTestData(new_id,new_taskId,new_startDate,new_duration, new_key) async {
+Future<void> initTestData(
+    new_id, new_taskId, new_startDate, new_duration, new_key) async {
   final Record myTask = Record.fromJson({
     'info': {
-      'id': ''+new_id,
-      'taskId': ''+new_taskId,
-      'startDate': ''+new_startDate,
-      'duration':''+new_duration
+      'id': '' + new_id,
+      'taskId': '' + new_taskId,
+      'startDate': '' + new_startDate,
+      'duration': '' + new_duration
     },
     'token': 'xxx'
   });
@@ -177,9 +201,9 @@ Future<void> initTestData(new_id,new_taskId,new_startDate,new_duration, new_key)
 }
 
 //TODO https://stackoverflow.com/questions/54327164/flutter-remove-all-saved-shared-preferences
-Future<void> removeData(task_id,key) async{
+Future<void> removeData(task_id, key) async {
   SharedPreferences mySPrefs = await SharedPreferences.getInstance();
-    mySPrefs.remove(task_id+'task'+key);
+  mySPrefs.remove(task_id + 'task' + key);
 }
 
 Future<Record> getTaskInfo() async {
@@ -214,8 +238,6 @@ Future<Record> getRecordInfoKey(key) async {
   return null;
 }
 
-
-
 //schemat JSON RECORD-----------------------------------------------------------------
 //(new_id,new_taskId,new_startDate,new_duration, new_key)
 class RecordInfo {
@@ -224,22 +246,22 @@ class RecordInfo {
   String startDate;
   String duration;
 
-
-  RecordInfo({this.id, this.taskId, this.startDate,this.duration});
+  RecordInfo({this.id, this.taskId, this.startDate, this.duration});
   RecordInfo.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    taskId= json['taskId'];
-    startDate= json['startDate'];
-    duration= json['duration'];
+    taskId = json['taskId'];
+    startDate = json['startDate'];
+    duration = json['duration'];
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = Map<String, dynamic>();
     data['id'] = this.id;
-    data['taskId']=this.taskId;
-    data['startDate']=this.startDate;
-    data['duration']=this.duration;
+    data['taskId'] = this.taskId;
+    data['startDate'] = this.startDate;
+    data['duration'] = this.duration;
     return data;
   }
+
   @override
   String toString() {
     return '"info" : { "id": $id, '
@@ -275,9 +297,10 @@ class Record {
   // String getName(){
   //   return this.info.name;
   // }
-      String getStartDate(){
+  String getStartDate() {
     return this.info.startDate;
-      }
+  }
+
   @override
   String toString() {
     return '"Task-> " : {${info.toString()}, "token": $token}';

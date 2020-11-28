@@ -1,7 +1,7 @@
 //TODO czas trwania danego zadania(rekordu), nazwa zadania,data ,start,
 // TODO stop, dodaj określony czas(popup odkiedy do kiedy?), podaj stawkę godzinową
 import 'package:flutter/material.dart';
-import 'package:pim_core_app/record_list.dart';
+import 'record_list.dart';
 
 
 class RecordEditRoute extends StatelessWidget {

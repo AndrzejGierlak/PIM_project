@@ -1,14 +1,16 @@
 // TODO Implement this library.
 // TODO https://flutter.dev/docs/cookbook/navigation/navigation-basics
 import 'package:flutter/material.dart';
-import 'package:pim_core_app/record_list.dart';
-import 'package:pim_core_app/task_list.dart';
-import 'package:pim_core_app/task_statistics.dart';
-import 'package:pim_core_app/help.dart';
-import 'package:pim_core_app/home_page.dart';
-import 'package:pim_core_app/record_edit.dart';
-import 'package:pim_core_app/task_new.dart';
-import 'package:pim_core_app/record_new.dart';
+import 'package:time_management/menu_drawer.dart';
+
+import 'help.dart';
+import 'home_page.dart';
+import 'record_edit.dart';
+import 'record_list.dart';
+import 'record_new.dart';
+import 'task_list.dart';
+import 'task_new.dart';
+import 'task_statistics.dart';
 
 
 class MenuRoute extends StatelessWidget {
@@ -18,6 +20,7 @@ class MenuRoute extends StatelessWidget {
       appBar: AppBar(
         title: Text("Menu Route(testing only)"),
       ),
+      drawer: MenuDrawer(),
       body: Center(
         child:
         Column(

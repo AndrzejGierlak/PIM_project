@@ -1,7 +1,7 @@
 //TODO czas trwania danego zadania(rekordu), nazwa zadania,data ,start,
 // TODO stop, dodaj określony czas(popup odkiedy do kiedy?), podaj stawkę godzinową
 import 'package:flutter/material.dart';
-import 'package:pim_core_app/task_list.dart';
+import 'task_list.dart';
 
 class TaskEditRoute extends StatelessWidget {
   final Task passedTask;
@@ -20,7 +20,7 @@ class TaskEditRoute extends StatelessWidget {
                 Text('Task name: '+passedTask.info.name),
                 Text('Description: '+passedTask.info.description),
                 Text('TaskId: '+passedTask.info.id),
-                Text('Color: '+passedTask.info.color),
+                Text('Color: '+passedTask.info.color.toString()),
                 Text('Salary: '+passedTask.info.salary),
               ]
           )
