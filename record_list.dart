@@ -69,27 +69,12 @@ class _RecordListWidgetState extends State<RecordListWidget> {
     //TODO!!!!!! uwaga jest problem z indexami- obecnie mozna usuwac tylko najwiekszy index żeby dzialalo prawidlowo
     //TODO PRZYCZYNA: zaimplementowane jest wczytywanie wczytuj dopoki od 0 znajdujesz cos na danym kluczu
     // TODO pomysl na robienie-> po usuwaniu trzeba zapisac wszystkie elementy tablicy od poczatku(0) do konca
-    //taskNameList.add(await getTaskInfoKey('key1').getName());
-    //initialTestLoad();//TODO
-    initialLoadFull();
+
+    loadRecordsTo(recordList, this, parentTaskId);
   }
 
 
-  //status: Zrobione, używane
-  //poprawny load danych- wczytuj dopoki odczytujesz cos z pamieci
-  //dane są odczytywane bezpośrednio w Liście
-  void initialLoadFull () async {
-    var i=0;
-    print("ParentTaskId is: "+parentTaskId);
-    Record temp=await getRecordInfoKey(parentTaskId+'task'+i.toString());//TODO zmien zahardcodowane 2 na parametr przekazany przy konstruktorze tego screena
-    while(temp!=null){
-      print("wszedlem");
-      recordList.add(temp);
-      i+=1;
-      temp=await getRecordInfoKey(parentTaskId+'task'+i.toString());
-    }
-    setState(() {});//zeby odswiezyc- nie zapominac o tym bo inaczej widok się nie rerenderuje
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -141,6 +126,23 @@ class _RecordListWidgetState extends State<RecordListWidget> {
   }
 
 }
+
+
+//TODO API VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+//status: Zrobione, używane
+//read records to recordListParam, update state in thisParam, parentTaskIdParam
+void loadRecordsTo (recordListParam, thisParam,parentTaskIdParam) async {
+  //print("ParentTaskId is: "+parentTaskIdParam);
+  var i=0;
+  Record temp=await getRecordInfoKey(parentTaskIdParam+'task'+i.toString());//TODO zmien zahardcodowane 2 na parametr przekazany przy konstruktorze tego screena
+  while(temp!=null){
+    recordListParam.add(temp);
+    i+=1;
+    temp=await getRecordInfoKey(parentTaskIdParam+'task'+i.toString());
+  }
+  thisParam.setState(() {});//rerender
+}
+//TODO API ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 //TODO (z)robione zapis i odczyt jsona--------------------------------------------------------------

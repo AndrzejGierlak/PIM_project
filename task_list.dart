@@ -36,33 +36,17 @@ class _DemoScreenState extends State<DemoScreen> {
 
     saveTaskInfo();
     //format dodawania danych TASK
-    //(new_id,new_name,new_color,new_salary,new_description,new_records,new_recordsCounter, new_key)
-    // niech pracaKey= "records"+id taska i tyle
+    //(new_id,new_name,new_color,new_salary,new_description, new_key)
 
     //przykladowa inicjacja danych, odkomentuj ponizsze i zapisz aby wgrac do "bazy" przykladowe dane, potem zakomentuj
-    initTestData('0','praca inżynierska','biały','30','opis pracy jest nudny','pracaKey','1','task0');//TODO
-    initTestData('1','PIM','czarny','0','opis PIM jest nudny','pracaKey','1','task1');//TODO
-    initTestData('2','AKC projekt','czerwony','10','opis AKC jest ciekawy','pracaKey','1','task2');//TODO
+    //initTestTaskData('0','praca inżynierska','biały','30','opis pracy jest nudny','task0');
+   // initTestTaskData('1','PIM','czarny','0','opis PIM jest nudny','task1');
+    //initTestTaskData('2','AKC projekt','czerwony','10','opis AKC jest ciekawy','task2');
 
-    //taskNameList.add(await getTaskInfoKey('key1').getName());
-    //initialTestLoad();//TODO
-    initialLoadFull();
+    loadTasksTo(taskList, this);
   }
 
 
-  //status: Zrobione, używane
-  //poprawny load danych- wczytuj dopoki odczytujesz cos z pamieci
-  //dane są odczytywane bezpośrednio w Liście
-  void initialLoadFull () async {
-    var i=0;
-    Task temp=await getTaskInfoKey('task'+i.toString());
-    while(temp!=null){
-      taskList.add(temp);
-      i+=1;
-      temp=await getTaskInfoKey('task'+i.toString());
-    }
-    setState(() {});//zeby odswiezyc- nie zapominac o tym bo inaczej widok się nie rerenderuje
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +74,7 @@ class _DemoScreenState extends State<DemoScreen> {
 
                 ),
                 onTap:()=>{
-                print("Pushowany taskID to : "+taskList[index].getId()),
+                print("Rekordy dla taskID : "+taskList[index].getId()),
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -116,6 +100,54 @@ class _DemoScreenState extends State<DemoScreen> {
 
 }
 
+//TODO Funkcje API VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+//status: Zrobione, używane
+// taskList -> lista do ktorej wczytujesz dane z zapisanych plików ("bazy")
+// thisParam -> przekazujesz po prostu "this"- dzięki temu odświeżasz stan, wyświetlane są poprawne dane
+//wczytywane są kolejne taski licząc od 0 do aż znajdzie null
+void loadTasksTo (taskListParam ,thisParam) async {
+  var i=0;
+  Task temp=await getTaskInfoKey('task'+i.toString());
+  while(temp!=null){
+    print("dodaje");
+    taskListParam.add(temp);
+    i+=1;
+    temp=await getTaskInfoKey('task'+i.toString());
+  }
+  thisParam.setState(() {});//zeby odswiezyc- nie zapominac o tym bo inaczej widok się nie rerenderuje
+}
+
+void loadAllTo (taskListParam ,thisParam,recordListParam) async {
+  var i=0;
+  Task temp=await getTaskInfoKey('task'+i.toString());
+  while(temp!=null){
+    print("dodaje");
+    taskListParam.add(temp);
+    i+=1;
+    temp=await getTaskInfoKey('task'+i.toString());
+  }
+  for(var j=0;j<i;j+=1){//j to index tablicy obecnego taska, i to otrzymany rozmiar tablicy taskow
+    List<Record> tempListR=List<Record>();
+    var k=0;//k to index tablicy danego recordu
+    Record tempR=await getRecordInfoKey(taskListParam[j].getId()+'task'+k.toString());//TODO zmien zahardcodowane 2 na parametr przekazany przy konstruktorze tego screena
+    while(tempR!=null){
+      //recordListParam.add(tempR);
+      tempListR.add(tempR);
+      k+=1;
+      tempR=await getRecordInfoKey(taskListParam[j].getId()+'task'+k.toString());
+    }
+    recordListParam.add(tempListR);
+    //loadRecordsTo(tempListRecord, this, taskList[j].getId());//tutaj ryzykowny setState- rerender!!
+    //print(tempListRecord.length);
+    //allRecordList.add(tempListRecord);
+  }
+  print("Record lista spod taska id:0 -- "+recordListParam[0].toString());
+  print("Record lista spod taska id:1 -- "+recordListParam[1].toString());
+  print("Record lista spod taska id:2 -- "+recordListParam[2].toString());
+  thisParam.setState(() {});//zeby odswiezyc- nie zapominac o tym bo inaczej widok się nie rerenderuje
+}
+//TODO API ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 //TODO robione zapis i odczyt jsona--------------------------------------------------------------
 Future<void> saveTaskInfo() async {
@@ -126,8 +158,8 @@ Future<void> saveTaskInfo() async {
       'color': 'Red?',
       'salary':'25/h',
       'description':'very very long desription of pointless task',
-      'records':'importantValue',//do miejsca w pamieci gdzie są rekordy tego taska
-      'recordsCounter':'4'//liczba rekordów pod tym taskiem, mozliwe ze niepotrzebne
+      //'records':'importantValue',//do miejsca w pamieci gdzie są rekordy tego taska
+      //'recordsCounter':'4'//liczba rekordów pod tym taskiem, mozliwe ze niepotrzebne
     },
     'token': 'xxx'
   });
@@ -137,7 +169,8 @@ Future<void> saveTaskInfo() async {
   print(result);
 }
 
-Future<void> initTestData(new_id,new_name,new_color,new_salary,new_description,new_records,new_recordsCounter, new_key) async {
+//Future<void> initTestTaskData(new_id,new_name,new_color,new_salary,new_description,new_records,new_recordsCounter, new_key) async {
+Future<void> initTestTaskData(new_id,new_name,new_color,new_salary,new_description, new_key) async {
   final Task myTask = Task.fromJson({
     'info': {
       'id': ''+new_id,
@@ -145,8 +178,6 @@ Future<void> initTestData(new_id,new_name,new_color,new_salary,new_description,n
       'color': ''+new_color,
       'salary':''+new_salary,
       'description':''+new_description,
-      'records':''+new_records,//do miejsca w pamieci gdzie są rekordy tego taska
-      'recordsCounter':''+new_recordsCounter//liczba rekordów pod tym taskiem, mozliwe ze niepotrzebne
     },
     'token': 'xxx'
   });
@@ -195,19 +226,15 @@ class TaskInfo {
   String color;
   String salary;
   String description;
-  String records;
-  String recordsCounter;
 
 
-  TaskInfo({this.id, this.name, this.color,this.salary,this.description,this.records,this.recordsCounter});
+  TaskInfo({this.id, this.name, this.color,this.salary,this.description});//,this.records,this.recordsCounter});
   TaskInfo.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     color= json['color'];
     salary=json['salary'];
     description=json['description'];
-    records=json['records'];
-    recordsCounter=json['recordsCounter'];
 
   }
   Map<String, dynamic> toJson() {
@@ -217,8 +244,6 @@ class TaskInfo {
     data['color']= this.color;
     data['salary']=this.salary;
     data['description']=this.description;
-    data['records']=this.records;
-    data['recordsCounter']=this.recordsCounter;
     return data;
   }
   @override
@@ -228,8 +253,6 @@ class TaskInfo {
         '"color": $color,'
         '"salary": $salary,'
         '"description": $description,'
-        '"records": $records,'
-        '"recordsCounter": $recordsCounter'
         '}';
   }
 }
