@@ -3,20 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-class RecordNewRoute extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Nowy record"),
-      ),
-      body: RecordNewWidget(),
-    );
-  }
-}
+import 'task_model.dart';
 
 class RecordNewWidget extends StatefulWidget {
-  RecordNewWidget({Key key}) : super(key: key);
+  final List<Task> tasks;
+
+  RecordNewWidget({Key key, @required this.tasks}) : super(key: key);
 
   @override
   _RecordNewWidgetState createState() => _RecordNewWidgetState();
@@ -27,6 +19,7 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
   final _dateController = TextEditingController();
   final _startController = TextEditingController();
   final _durationController = TextEditingController();
+  Task _selectedTask;
 
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay(hour: 00, minute: 00);
@@ -39,17 +32,16 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
         firstDate: DateTime(2010),
         lastDate: DateTime(2030));
     if (picked != null) {
-        setState(() {
-          _selectedDate = picked;
-          _dateController.text = DateFormat.yMMMd("pl_PL").format(_selectedDate);
-        });
-      }
+      setState(() {
+        _selectedDate = picked;
+        _dateController.text = DateFormat.yMMMd("pl_PL").format(_selectedDate);
+      });
+    }
   }
 
   Future<Null> _selectStart(BuildContext context) async {
-    final TimeOfDay picked = await showTimePicker(
-        context: context,
-        initialTime: _selectedTime);
+    final TimeOfDay picked =
+        await showTimePicker(context: context, initialTime: _selectedTime);
     if (picked != null) {
       setState(() {
         _selectedTime = picked;
@@ -69,7 +61,6 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
     super.dispose();
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -77,11 +68,26 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
     DateTime now = DateTime.now();
     var dateString = DateFormat('dd-MM-yyyy').format(now);
     final String configFileName = 'lastConfig.$dateString.json';
-    _dateController.text = DateFormat.yMd().format(DateTime.now());
+
+    setState(() {
+      _dateController.text = DateFormat.yMMMd("pl_PL").format(_selectedDate);
+    });
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildTaskButton(Task task) {
+    return Row(
+      children: [
+        Icon(
+          Icons.brightness_1_rounded,
+          color: Color(task.color),
+        ),
+        SizedBox(width: 20,),
+        Text(task.name, style: TextStyle(fontSize: 18.0))
+      ],
+    );
+  }
+
+  Widget _buildForm() {
     return Form(
       key: _formKey,
       child: Column(
@@ -95,12 +101,18 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 border: const OutlineInputBorder(),
               ),
-              items: [
-                DropdownMenuItem(child: Text("1")),
-                DropdownMenuItem(child: Text("2")),
-                DropdownMenuItem(child: Text("3")),
-              ],
-              onChanged: (value) {},
+              value: _selectedTask,
+              selectedItemBuilder: (BuildContext context) {
+                return widget.tasks.map<Widget>((t) {
+                  return _buildTaskButton(t);
+                }).toList();
+              },
+              items: widget.tasks.map((t) {
+                return DropdownMenuItem<Task>(
+                    child: _buildTaskButton(t),
+                    value: t);
+              }).toList(),
+              onChanged: (value) => setState(() => _selectedTime = value),
             ),
           ),
           Padding(
@@ -141,7 +153,6 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: TextFormField(
-              autofocus: true,
               decoration: const InputDecoration(
                 labelText: "Czas pracy",
                 border: const OutlineInputBorder(),
@@ -157,5 +168,15 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
         ],
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Dodaj nowy wpis"),
+          actions: [IconButton(icon: Icon(Icons.save), onPressed: () {})],
+        ),
+        body: SingleChildScrollView(child: _buildForm()));
   }
 }

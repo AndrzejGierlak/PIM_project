@@ -1,7 +1,7 @@
 //TODO czas trwania danego zadania(rekordu), nazwa zadania,data ,start,
 // TODO stop, dodaj określony czas(popup odkiedy do kiedy?), podaj stawkę godzinową
 import 'package:flutter/material.dart';
-import 'record_list.dart';
+import "record_model.dart";
 
 
 class RecordEditRoute extends StatelessWidget {
@@ -19,10 +19,10 @@ class RecordEditRoute extends StatelessWidget {
         child: Column(
             children: <Widget>[
               //Text(passedRecord.info.duration),
-            Text('Duration: '+passedRecord.info.duration),
-            Text('Start date: '+passedRecord.info.startDate),
-              Text('TaskId: '+passedRecord.info.taskId),
-              Text('This record id: '+passedRecord.info.id),
+            Text('Duration: $passedRecord.duration'),
+            Text('Start date: $passedRecord.startDate'),
+              Text('TaskId: $passedRecord.taskId'),
+              Text('This record id: $passedRecord.id'),
         ]
         )
 

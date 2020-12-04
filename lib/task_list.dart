@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import 'task_new.dart';
+import "task_model.dart";
+import "task_controller.dart";
 
 class TaskListRoute extends StatelessWidget {
   @override
@@ -36,38 +38,11 @@ class _DemoScreenState extends State<DemoScreen> {
   @override
   void initState() {
     super.initState();
-
-    saveTaskInfo();
-    //format dodawania danych TASK
-    //(new_id,new_name,new_color,new_salary,new_description,new_records,new_recordsCounter, new_key)
-    // niech pracaKey= "records"+id taska i tyle
-
-    //przykladowa inicjacja danych, odkomentuj ponizsze i zapisz aby wgrac do "bazy" przykladowe dane, potem zakomentuj
-    initTestData('0', 'Praca inżynierska', 0xFFFF0000, '30',
-        'opis pracy jest nudny', 'pracaKey', '1', 'task0'); //TODO
-    initTestData('1', 'PIM', 0xFF00FF00, '0', 'opis PIM jest nudny', 'pracaKey',
-        '1', 'task1'); //TODO
-    initTestData('2', 'AKC projekt', 0xFF0000FF, '10', 'opis AKC jest ciekawy',
-        'pracaKey', '1', 'task2'); //TODO
-
-    //taskNameList.add(await getTaskInfoKey('key1').getName());
-    //initialTestLoad();//TODO
-    initialLoadFull();
+    initTestData().then((value) => setState(() {}));
   }
 
-  //status: Zrobione, używane
-  //poprawny load danych- wczytuj dopoki odczytujesz cos z pamieci
-  //dane są odczytywane bezpośrednio w Liście
-  void initialLoadFull() async {
-    var i = 0;
-    Task temp = await getTaskInfoKey('task' + i.toString());
-    while (temp != null) {
-      taskList.add(temp);
-      i += 1;
-      temp = await getTaskInfoKey('task' + i.toString());
-    }
-    setState(
-        () {}); //zeby odswiezyc- nie zapominac o tym bo inaczej widok się nie rerenderuje
+  Future<void> initTestData() async {
+    taskList = await getTasks();
   }
 
   Widget _buildTaskList() {
@@ -84,20 +59,10 @@ class _DemoScreenState extends State<DemoScreen> {
       child: ListTile(
         leading: Icon(
           Icons.brightness_1_rounded,
-          color: Color(task.getColor()),
+          color: Color(task.color),
         ),
-        title: Text(task.getName(), style: TextStyle(fontSize: 18.0)),
+        title: Text(task.name, style: TextStyle(fontSize: 18.0)),
         onTap: () => {
-          print("Pushowany taskID to : " + task.getId()),
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  TaskRecordListRoute(parentTaskId: task.getId()),
-            ),
-          )
-        },
-        onLongPress: () => {
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -105,6 +70,7 @@ class _DemoScreenState extends State<DemoScreen> {
             ),
           )
         },
+        onLongPress: () => {},
       ),
     );
   }
@@ -114,184 +80,14 @@ class _DemoScreenState extends State<DemoScreen> {
     return Scaffold(
       body: Center(child: _buildTaskList()),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => TaskNewRoute()),
-          );
-        },
-        child: Icon(Icons.add)
-      ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => TaskNewRoute()),
+            );
+          },
+          child: Icon(Icons.add)),
     );
-  }
-}
-
-//TODO robione zapis i odczyt jsona--------------------------------------------------------------
-Future<void> saveTaskInfo() async {
-  final Task myTask = Task.fromJson({
-    'info': {
-      'id': '1',
-      'name': 'pointless task NAME',
-      'color': 'Red?',
-      'salary': '25/h',
-      'description': 'very very long desription of pointless task',
-      'records':
-          'importantValue', //do miejsca w pamieci gdzie są rekordy tego taska
-      'recordsCounter':
-          '4' //liczba rekordów pod tym taskiem, mozliwe ze niepotrzebne
-    },
-    'token': 'xxx'
-  });
-
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  bool result = await prefs.setString('howToMapTask', jsonEncode(myTask));
-  print(result);
-}
-
-Future<void> initTestData(new_id, new_name, int new_color, new_salary,
-    new_description, new_records, new_recordsCounter, new_key) async {
-  final Task myTask = Task.fromJson({
-    'info': {
-      'id': '' + new_id,
-      'name': '' + new_name,
-      'color': new_color,
-      'salary': '' + new_salary,
-      'description': '' + new_description,
-      'records':
-          '' + new_records, //do miejsca w pamieci gdzie są rekordy tego taska
-      'recordsCounter': '' +
-          new_recordsCounter //liczba rekordów pod tym taskiem, mozliwe ze niepotrzebne
-    },
-    'token': 'xxx'
-  });
-  print(myTask);
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  bool result = await prefs.setString(new_key, jsonEncode(myTask));
-}
-
-Future<Task> getTaskInfo() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-  Map<String, dynamic> userMap;
-  final String userStr = prefs.getString('howToMapTask');
-  if (userStr != null) {
-    userMap = jsonDecode(userStr) as Map<String, dynamic>;
-  }
-
-  if (userMap != null) {
-    final Task myTask = Task.fromJson(userMap);
-    print(myTask);
-    return myTask;
-  }
-  return null;
-}
-
-Future<Task> getTaskInfoKey(key) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-  Map<String, dynamic> taskMap;
-  final String takStr = prefs.getString(key);
-  if (takStr != null) {
-    taskMap = jsonDecode(takStr) as Map<String, dynamic>;
-  }
-
-  if (taskMap != null) {
-    final Task myTask = Task.fromJson(taskMap);
-    print(myTask);
-    return myTask;
-  }
-  return null;
-}
-
-//schemat JSON TASK-----------------------------------------------------------------
-class TaskInfo {
-  String id;
-  String name;
-  int color;
-  String salary;
-  String description;
-  String records;
-  String recordsCounter;
-
-  TaskInfo(
-      {this.id,
-      this.name,
-      this.color,
-      this.salary,
-      this.description,
-      this.records,
-      this.recordsCounter});
-  TaskInfo.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    color = json['color'];
-    salary = json['salary'];
-    description = json['description'];
-    records = json['records'];
-    recordsCounter = json['recordsCounter'];
-  }
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['color'] = this.color;
-    data['salary'] = this.salary;
-    data['description'] = this.description;
-    data['records'] = this.records;
-    data['recordsCounter'] = this.recordsCounter;
-    return data;
-  }
-
-  @override
-  String toString() {
-    return '"info" : { "id": $id, '
-        '"name": $name, '
-        '"color": $color,'
-        '"salary": $salary,'
-        '"description": $description,'
-        '"records": $records,'
-        '"recordsCounter": $recordsCounter'
-        '}';
-  }
-}
-//--------------------------------------------------------------------------
-
-class Task {
-  TaskInfo info;
-  String token;
-
-  Task({this.info, this.token});
-
-  Task.fromJson(Map<String, dynamic> json) {
-    info = json['info'] != null ? TaskInfo.fromJson(json['info']) : null;
-    token = json['token'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.info != null) {
-      data['info'] = this.info.toJson();
-      //pod info znajduje się schemat jsona taska
-    }
-    data['token'] = this.token;
-    return data;
-  }
-
-  String getName() {
-    return this.info.name;
-  }
-
-  String getId() {
-    return this.info.id;
-  }
-
-  int getColor() {
-    return this.info.color;
-  }
-
-  @override
-  String toString() {
-    return '"Task-> " : {${info.toString()}, "token": $token}';
   }
 }
 

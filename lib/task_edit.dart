@@ -2,10 +2,11 @@
 // TODO stop, dodaj określony czas(popup odkiedy do kiedy?), podaj stawkę godzinową
 import 'package:flutter/material.dart';
 import 'task_list.dart';
+import "task_model.dart";
 
 class TaskEditRoute extends StatelessWidget {
   final Task passedTask;
-  TaskEditRoute({Key key, @required this.passedTask}): super(key:key);
+  TaskEditRoute({Key key, @required this.passedTask}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,18 +15,14 @@ class TaskEditRoute extends StatelessWidget {
         title: Text("Single Task"),
       ),
       body: Center(
-          child: Column(
-              children: <Widget>[
-                //Text(passedRecord.info.duration),
-                Text('Task name: '+passedTask.info.name),
-                Text('Description: '+passedTask.info.description),
-                Text('TaskId: '+passedTask.info.id),
-                Text('Color: '+passedTask.info.color.toString()),
-                Text('Salary: '+passedTask.info.salary),
-              ]
-          )
-
-      ),
+          child: Column(children: <Widget>[
+        //Text(passedRecord.info.duration),
+        Text('Task name: ' + passedTask.name),
+        Text('Description: ' + passedTask.description),
+        Text('TaskId: $passedTask.id'),
+        Text('Color: ' + passedTask.color.toString()),
+        Text('Salary: ' + passedTask.salary),
+      ])),
     );
   }
 }

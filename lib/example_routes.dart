@@ -59,7 +59,7 @@ class MenuRoute extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => RecordNewRoute()),
+                  MaterialPageRoute(builder: (context) => RecordNewWidget()),
                 );
               },
             ),
