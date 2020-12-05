@@ -92,6 +92,10 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         itemCount: _records.length,
       ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+          },
+          child: Icon(Icons.play_arrow, size: 50)),
     );
   }
 }

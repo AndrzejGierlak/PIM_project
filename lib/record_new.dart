@@ -2,7 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:time_management/home_page.dart';
+import 'package:time_management/record_controller.dart';
 
+import 'record_model.dart';
 import 'task_model.dart';
 
 class RecordNewWidget extends StatefulWidget {
@@ -19,10 +22,11 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
   final _dateController = TextEditingController();
   final _startController = TextEditingController();
   final _durationController = TextEditingController();
-  Task _selectedTask;
 
+  Task _selectedTask;
   DateTime _selectedDate = DateTime.now();
-  TimeOfDay _selectedTime = TimeOfDay(hour: 00, minute: 00);
+  TimeOfDay _selectedTime = TimeOfDay.now().replacing(hour: TimeOfDay.now().hour - 1);
+  TimeOfDay _selectedDuration = TimeOfDay(hour: 1, minute: 0);
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -39,16 +43,30 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
     }
   }
 
+  String formatTime(TimeOfDay time) {
+    final hour = time.hour.toString().padLeft(2, "0");
+    final minute = time.minute.toString().padLeft(2, "0");
+    return  hour + ":" + minute;
+  }
+
   Future<Null> _selectStart(BuildContext context) async {
     final TimeOfDay picked =
         await showTimePicker(context: context, initialTime: _selectedTime);
     if (picked != null) {
       setState(() {
         _selectedTime = picked;
-        final hour = _selectedTime.hour.toString();
-        final minute = _selectedTime.minute.toString();
-        final time = hour + " : " + minute;
-        _startController.text = time;
+        _startController.text = formatTime(_selectedTime);
+      });
+    }
+  }
+
+  Future<Null> _selectDuration(BuildContext context) async {
+    final TimeOfDay picked =
+    await showTimePicker(context: context, initialTime: _selectedDuration);
+    if (picked != null) {
+      setState(() {
+        _selectedDuration = picked;
+        _durationController.text = formatTime(_selectedDuration);
       });
     }
   }
@@ -71,6 +89,8 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
 
     setState(() {
       _dateController.text = DateFormat.yMMMd("pl_PL").format(_selectedDate);
+      _startController.text = formatTime(_selectedTime);
+      _durationController.text = formatTime(_selectedDuration);
     });
   }
 
@@ -112,7 +132,13 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
                     child: _buildTaskButton(t),
                     value: t);
               }).toList(),
-              onChanged: (value) => setState(() => _selectedTime = value),
+              onChanged: (value) => setState(() => _selectedTask = value),
+              validator: (value) {
+                if (value == null) {
+                  return 'Wybierz zadanie!';
+                }
+                return null;
+              },
             ),
           ),
           Padding(
@@ -126,7 +152,7 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
               ),
               validator: (value) {
                 if (value.isEmpty) {
-                  return 'Podaj godzinę rozpoczęcia pracy!';
+                  return 'Podaj datę rozpoczęcia pracy!';
                 }
                 return null;
               },
@@ -138,6 +164,8 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: TextFormField(
+              controller: _startController,
+              readOnly: true,
               decoration: const InputDecoration(
                 labelText: "Godzina rozpoczęcia",
                 border: const OutlineInputBorder(),
@@ -148,20 +176,28 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
                 }
                 return null;
               },
+              onTap: () {
+                _selectStart(context);
+              },
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: TextFormField(
+              controller: _durationController,
+              readOnly: true,
               decoration: const InputDecoration(
                 labelText: "Czas pracy",
                 border: const OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value.isEmpty) {
-                  return 'Podaj czas pracy!';
+                  return 'Podaj czas pracy pracy!';
                 }
                 return null;
+              },
+              onTap: () {
+                _selectDuration(context);
               },
             ),
           ),
@@ -170,12 +206,29 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
     );
   }
 
+  void _submitForm() {
+    if (_formKey.currentState.validate()) {
+      DateTime date = new DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _selectedTime.hour, _selectedTime.minute );
+      Record newRecord = new Record(
+        taskId: _selectedTask.id,
+        startDate: date,
+        duration: _selectedDuration
+      );
+      addRecord(newRecord);
+      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePageRoute()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text("Dodaj nowy wpis"),
-          actions: [IconButton(icon: Icon(Icons.save), onPressed: () {})],
+          actions: [IconButton(icon: Icon(Icons.save), onPressed: _submitForm)],
         ),
         body: SingleChildScrollView(child: _buildForm()));
   }

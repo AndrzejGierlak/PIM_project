@@ -2,12 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:time_management/menu_drawer.dart';
-import 'help.dart';
-import 'record_list.dart';
-import 'record_edit.dart';
 import 'task_edit.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 
 import 'task_new.dart';
 import "task_model.dart";
@@ -16,14 +11,7 @@ import "task_controller.dart";
 class TaskListRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: MenuDrawer(),
-      appBar: AppBar(
-        title: Text("Task list"),
-      ),
-      //body: TaskListRouteS(),
-      body: DemoScreen(),
-    );
+    return DemoScreen();
   }
 }
 
@@ -55,29 +43,35 @@ class _DemoScreenState extends State<DemoScreen> {
   }
 
   Widget _buildRow(Task task) {
-    return Card(
-      child: ListTile(
-        leading: Icon(
-          Icons.brightness_1_rounded,
-          color: Color(task.color),
-        ),
-        title: Text(task.name, style: TextStyle(fontSize: 18.0)),
-        onTap: () => {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TaskEditRoute(passedTask: task),
+    return Padding(
+        padding: EdgeInsets.all(2.0),
+        child: Card(
+          child: ListTile(
+            leading: Icon(
+              Icons.brightness_1_rounded,
+              color: Color(task.color),
             ),
-          )
-        },
-        onLongPress: () => {},
-      ),
-    );
+            title: Text(task.name, style: TextStyle(fontSize: 18.0)),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TaskEditRoute(passedTask: task),
+                ),
+              )
+            },
+            onLongPress: () => {},
+          ),
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: MenuDrawer(),
+      appBar: AppBar(
+        title: Text("Task list"),
+      ),
       body: Center(child: _buildTaskList()),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -86,7 +80,7 @@ class _DemoScreenState extends State<DemoScreen> {
               MaterialPageRoute(builder: (context) => TaskNewRoute()),
             );
           },
-          child: Icon(Icons.add)),
+          child: Icon(Icons.add, size: 50)),
     );
   }
 }
