@@ -15,17 +15,17 @@ class MenuDrawer extends StatelessWidget {
               icon: Icons.timer,
               text: 'Rejestr czasu pracy',
               onTap: () =>
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()))),
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()))),
           _createDrawerItem(
               icon: Icons.work,
               text: 'Zadanie',
               onTap: () =>
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => TaskListRoute()))),
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => TaskListRoute()))),
           _createDrawerItem(
               icon: Icons.bar_chart,
               text: 'Statystyki',
               onTap: () =>
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => TaskStatisticsRoute()))),
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => TaskStatisticsRoute()))),
           Divider(),
           _createDrawerItem(icon: Icons.help, text: 'Autorzy'),
         ],

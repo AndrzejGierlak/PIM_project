@@ -113,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final DateTime date = DateTime.fromMillisecondsSinceEpoch(key);
 
     return Padding(
-        padding: EdgeInsets.only(bottom: 8.0),
+        padding: EdgeInsets.only(bottom: 2.0),
         child: Card(
             child: ExpansionTile(
           title: Text(formatDate(date), style: TextStyle(fontSize: 18.0)),
@@ -122,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildDatesList() {
-    List<int> keys = _groupedRecords.keys.toList();
+    List<int> keys = _groupedRecords.keys.toList()..sort((a, b) => b.compareTo(a));
     return ListView.builder(
       itemBuilder: (context, i) {
         return _buildRow(keys[i]);

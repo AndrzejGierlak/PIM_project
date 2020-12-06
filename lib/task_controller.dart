@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'record_controller.dart';
 import "task_model.dart";
 
 Future<void> saveTasks(List<Task> tasks) async {
@@ -26,5 +27,31 @@ Future<List<Task>> getTasks() async {
 Future<void> addTask(Task task) async {
   List<Task> tasksList = await getTasks();
   tasksList.add(task);
+  saveTasks(tasksList);
+}
+
+Future<void> removeTask(Task task) async {
+  List<Task> tasksList = await getTasks();
+  try {
+    removeRecordsFromTask(task);
+    tasksList.removeWhere((item) => item.id == task.id);
+  } catch (e) {
+    print("[Function removeTask in task_controller] Error:\n $e");
+  }
+  saveTasks(tasksList);
+}
+
+Future<void> editTask(Task task, String name, int color, String salary,
+    String description) async {
+  List<Task> tasksList = await getTasks();
+  try {
+    tasksList.singleWhere((item) => item.id == task.id).name = name;
+    tasksList.singleWhere((item) => item.id == task.id).color = color;
+    tasksList.singleWhere((item) => item.id == task.id).salary = salary;
+    tasksList.singleWhere((item) => item.id == task.id).description =
+        description;
+  } catch (e) {
+    print("[Function editTask in task_controller] Error:\n $e");
+  }
   saveTasks(tasksList);
 }
