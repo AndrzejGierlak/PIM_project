@@ -218,7 +218,7 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
       Navigator.pop(context);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePageRoute()),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     }
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'record_list.dart';
+import 'package:time_management/home_page.dart';
 import 'task_list.dart';
 import 'task_statistics.dart';
 
@@ -15,7 +15,7 @@ class MenuDrawer extends StatelessWidget {
               icon: Icons.timer,
               text: 'Rejestr czasu pracy',
               onTap: () =>
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => TaskRecordListRoute()))),
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()))),
           _createDrawerItem(
               icon: Icons.work,
               text: 'Zadanie',

@@ -6,7 +6,6 @@ import 'package:time_management/menu_drawer.dart';
 import 'help.dart';
 import 'home_page.dart';
 import 'record_edit.dart';
-import 'record_list.dart';
 import 'record_new.dart';
 import 'task_list.dart';
 import 'task_new.dart';
@@ -32,7 +31,7 @@ class MenuRoute extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HomePageRoute()),
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
                 );
               },
             ),
@@ -69,15 +68,6 @@ class MenuRoute extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => TaskListRoute()),
-                );
-              },
-            ),
-            ElevatedButton(
-              child: Text('Record List direct view'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TaskRecordListRoute()),
                 );
               },
             ),
