@@ -36,29 +36,11 @@ class MenuRoute extends StatelessWidget {
               },
             ),
             ElevatedButton(
-              child: Text('Open Task Record'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RecordEditRoute()),
-                );
-              },
-            ),
-            ElevatedButton(
               child: Text('Open TaskNew'),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => TaskNewRoute()),
-                );
-              },
-            ),
-            ElevatedButton(
-              child: Text('Open RecordNew'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RecordNewWidget()),
+                  MaterialPageRoute(builder: (context) => TaskNewWidget()),
                 );
               },
             ),

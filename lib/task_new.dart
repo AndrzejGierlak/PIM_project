@@ -6,13 +6,6 @@ import 'package:time_management/task_list.dart';
 
 import 'task_model.dart';
 
-class TaskNewRoute extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return TaskNewWidget();
-  }
-}
-
 class TaskNewWidget extends StatefulWidget {
   TaskNewWidget({Key key}) : super(key: key);
 

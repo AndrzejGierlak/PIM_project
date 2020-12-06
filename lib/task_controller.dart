@@ -41,17 +41,15 @@ Future<void> removeTask(Task task) async {
   saveTasks(tasksList);
 }
 
-Future<void> editTask(Task task, String name, int color, String salary,
-    String description) async {
+Future<void> updateTask(Task task) async {
   List<Task> tasksList = await getTasks();
-  try {
-    tasksList.singleWhere((item) => item.id == task.id).name = name;
-    tasksList.singleWhere((item) => item.id == task.id).color = color;
-    tasksList.singleWhere((item) => item.id == task.id).salary = salary;
-    tasksList.singleWhere((item) => item.id == task.id).description =
-        description;
-  } catch (e) {
-    print("[Function editTask in task_controller] Error:\n $e");
-  }
+  tasksList.forEach((item) {
+    if (item.id == task.id) {
+      item.name = task.name;
+      item.salary = task.salary;
+      item.description = task.description;
+      item.color = task.color;
+    }
+  });
   saveTasks(tasksList);
 }

@@ -79,7 +79,7 @@ class _DemoScreenState extends State<DemoScreen> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => TaskEditRoute(passedTask: task),
+              builder: (context) => TaskEditWidget(editedTask: task),
             ));
       },
       onLongPress: () {
@@ -115,7 +115,7 @@ class _DemoScreenState extends State<DemoScreen> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => TaskNewRoute()),
+              MaterialPageRoute(builder: (context) => TaskNewWidget()),
             );
           },
           child: Icon(Icons.add, size: 50)),

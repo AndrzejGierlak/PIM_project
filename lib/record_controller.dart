@@ -41,16 +41,15 @@ Future<void> removeRecord(Record record) async {
   saveRecords(recordsList);
 }
 
-Future<void> editRecord(
-    Record record, DateTime startDate, TimeOfDay duration) async {
+Future<void> updateRecord(Record record) async {
   List<Record> recordsList = await getRecords();
-  try {
-    recordsList.singleWhere((item) => item.id == record.id).startDate =
-        startDate;
-    recordsList.singleWhere((item) => item.id == record.id).duration = duration;
-  } catch (e) {
-    print("[Function editRecord in record_controller] Error:\n $e");
-  }
+  recordsList.forEach((item) {
+    if (item.id == record.id) {
+      item.taskId = record.taskId;
+      item.startDate = record.startDate;
+      item.duration = record.duration;
+    }
+  });
   saveRecords(recordsList);
 }
 

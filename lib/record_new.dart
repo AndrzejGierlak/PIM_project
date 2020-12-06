@@ -82,10 +82,6 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
   @override
   void initState() {
     super.initState();
-    initializeDateFormatting();
-    DateTime now = DateTime.now();
-    var dateString = DateFormat('dd-MM-yyyy').format(now);
-    final String configFileName = 'lastConfig.$dateString.json';
 
     setState(() {
       _dateController.text = DateFormat.yMMMd("pl_PL").format(_selectedDate);
