@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:time_management/record_controller.dart';
+import 'package:time_management/record_edit.dart';
 import 'package:time_management/record_new.dart';
 import 'menu_drawer.dart';
 import "task_model.dart";
@@ -19,14 +20,24 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Task> _tasks = List<Task>();
   List<Record> _records = new List<Record>();
   Map _groupedRecords = new Map<int, List<Record>>();
+  var _tapPosition;
 
   @override
   void initState() {
     super.initState();
 
+    _reload();
+  }
+
+  void _reload() {
     initTestData().then((value) => setState(() {
-          _groupedRecords = groupRecords(_records);
-        }));
+      _groupedRecords = groupRecords(_records);
+    }));
+  }
+
+  Future<void> initTestData() async {
+    _tasks = await getTasks();
+    _records = await getRecords();
   }
 
   Map<int, List<Record>> groupRecords(List<Record> records) {
@@ -47,9 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return groupedRecords;
   }
 
-  Future<void> initTestData() async {
-    _tasks = await getTasks();
-    _records = await getRecords();
+  Future<void> _deleteRecord(Record record) async {
+    await removeRecord(record);
   }
 
   void _addNewRecord() {
@@ -60,6 +70,27 @@ class _HomeScreenState extends State<HomeScreen> {
                 tasks: _tasks,
               )),
     );
+  }
+
+  Future<String> _showPopupMenu() async {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+
+    return await showMenu(
+      context: context,
+      position: RelativeRect.fromRect(
+          _tapPosition & Size(40, 40), Offset.zero & overlay.size),
+      items: [
+        PopupMenuItem(
+          child: Text("Delete"),
+          value: "Delete",
+        ),
+      ],
+      elevation: 8.0,
+    );
+  }
+
+  void _storePosition(TapDownDetails details) {
+    _tapPosition = details.globalPosition;
   }
 
   String formatDate(DateTime date) {
@@ -83,27 +114,41 @@ class _HomeScreenState extends State<HomeScreen> {
     return _tasks.firstWhere((e) => e.id == taskID);
   }
 
-  List<Widget> _buildRecordslist(int key) {
+  List<Widget> _buildRecordsList(int key) {
     final List<Record> records = _groupedRecords[key];
     final List tiles = new List<Widget>();
 
     for (int i = 0; i < records.length; ++i) {
       final Record record = records[i];
       final Task assignedTask = findTask(record.taskId);
-      tiles.add(new ListTile(
-        leading: Icon(
-          Icons.brightness_1_rounded,
-          color: Color(assignedTask.color),
-        ),
-        title: Text(assignedTask.name, style: TextStyle(fontSize: 18.0)),
-        trailing: Text(
-          formatTime(record.startDate, record.duration),
-          style: TextStyle(fontSize: 14.0),
-          textAlign: TextAlign.right,
-        ),
-        onTap: () => {},
-        onLongPress: () => {},
-      ));
+      tiles.add(GestureDetector(
+          onTapDown: _storePosition,
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RecordEditRoute(passedRecord: record),
+                ));
+          },
+          onLongPress: () {
+            _showPopupMenu().then((value) {
+              if (value != null) {
+                _deleteRecord(record).then((value) => _reload());
+              }
+            });
+          },
+          child: new ListTile(
+            leading: Icon(
+              Icons.brightness_1_rounded,
+              color: Color(assignedTask.color),
+            ),
+            title: Text(assignedTask.name, style: TextStyle(fontSize: 18.0)),
+            trailing: Text(
+              formatTime(record.startDate, record.duration),
+              style: TextStyle(fontSize: 14.0),
+              textAlign: TextAlign.right,
+            ),
+          )));
     }
 
     return tiles;
@@ -117,12 +162,13 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Card(
             child: ExpansionTile(
           title: Text(formatDate(date), style: TextStyle(fontSize: 18.0)),
-          children: _buildRecordslist(key),
+          children: _buildRecordsList(key),
         )));
   }
 
   Widget _buildDatesList() {
-    List<int> keys = _groupedRecords.keys.toList()..sort((a, b) => b.compareTo(a));
+    List<int> keys = _groupedRecords.keys.toList()
+      ..sort((a, b) => b.compareTo(a));
     return ListView.builder(
       itemBuilder: (context, i) {
         return _buildRow(keys[i]);
