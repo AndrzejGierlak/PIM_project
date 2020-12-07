@@ -112,7 +112,12 @@ class _RecordEditWidgetState extends State<RecordEditWidget> {
           color: Color(task.color),
         ),
         SizedBox(width: 20,),
-        Text(task.name, style: TextStyle(fontSize: 18.0))
+        Expanded(
+            child: Text(
+              task.name,
+              style: TextStyle(fontSize: 18.0),
+              overflow: TextOverflow.ellipsis,
+            ))
       ],
     );
   }
@@ -126,6 +131,7 @@ class _RecordEditWidgetState extends State<RecordEditWidget> {
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: DropdownButtonFormField(
+              isExpanded: true,
               decoration: const InputDecoration(
                 labelText: "Zadanie",
                 floatingLabelBehavior: FloatingLabelBehavior.always,

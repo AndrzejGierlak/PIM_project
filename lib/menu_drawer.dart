@@ -25,7 +25,7 @@ class MenuDrawer extends StatelessWidget {
               icon: Icons.bar_chart,
               text: 'Statystyki',
               onTap: () =>
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => TaskStatisticsRoute()))),
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => TaskStatistics()))),
           Divider(),
           _createDrawerItem(icon: Icons.help, text: 'Autorzy'),
         ],

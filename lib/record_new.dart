@@ -25,7 +25,8 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
 
   Task _selectedTask;
   DateTime _selectedDate = DateTime.now();
-  TimeOfDay _selectedTime = TimeOfDay.now().replacing(hour: TimeOfDay.now().hour - 1);
+  TimeOfDay _selectedTime =
+      TimeOfDay.now().replacing(hour: TimeOfDay.now().hour - 1);
   TimeOfDay _selectedDuration = TimeOfDay(hour: 1, minute: 0);
 
   Future<Null> _selectDate(BuildContext context) async {
@@ -46,7 +47,7 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
   String formatTime(TimeOfDay time) {
     final hour = time.hour.toString().padLeft(2, "0");
     final minute = time.minute.toString().padLeft(2, "0");
-    return  hour + ":" + minute;
+    return hour + ":" + minute;
   }
 
   Future<Null> _selectStart(BuildContext context) async {
@@ -62,7 +63,7 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
 
   Future<Null> _selectDuration(BuildContext context) async {
     final TimeOfDay picked =
-    await showTimePicker(context: context, initialTime: _selectedDuration);
+        await showTimePicker(context: context, initialTime: _selectedDuration);
     if (picked != null) {
       setState(() {
         _selectedDuration = picked;
@@ -97,8 +98,15 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
           Icons.brightness_1_rounded,
           color: Color(task.color),
         ),
-        SizedBox(width: 20,),
-        Text(task.name, style: TextStyle(fontSize: 18.0))
+        SizedBox(
+          width: 20,
+        ),
+        Expanded(
+            child: Text(
+          task.name,
+          style: TextStyle(fontSize: 18.0),
+          overflow: TextOverflow.ellipsis,
+        ))
       ],
     );
   }
@@ -112,6 +120,7 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: DropdownButtonFormField(
+              isExpanded: true,
               decoration: const InputDecoration(
                 labelText: "Zadanie",
                 floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -125,8 +134,7 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
               },
               items: widget.tasks.map((t) {
                 return DropdownMenuItem<Task>(
-                    child: _buildTaskButton(t),
-                    value: t);
+                    child: _buildTaskButton(t), value: t);
               }).toList(),
               onChanged: (value) => setState(() => _selectedTask = value),
               validator: (value) {
@@ -204,12 +212,12 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
 
   void _submitForm() {
     if (_formKey.currentState.validate()) {
-      DateTime date = new DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _selectedTime.hour, _selectedTime.minute );
+      DateTime date = new DateTime(_selectedDate.year, _selectedDate.month,
+          _selectedDate.day, _selectedTime.hour, _selectedTime.minute);
       Record newRecord = new Record(
-        taskId: _selectedTask.id,
-        startDate: date,
-        duration: _selectedDuration
-      );
+          taskId: _selectedTask.id,
+          startDate: date,
+          duration: _selectedDuration);
       addRecord(newRecord);
       Navigator.pop(context);
       Navigator.pushReplacement(

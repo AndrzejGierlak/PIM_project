@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:time_management/home_page.dart';
-import "./example_routes.dart";
 void main() {
   runApp(MyApp());
 }
