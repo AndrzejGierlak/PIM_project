@@ -1,6 +1,7 @@
 /// Bar chart example
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:time_management/record_controller.dart';
 import 'package:time_management/record_model.dart';
 
@@ -43,8 +44,6 @@ class _TaskStatisticsState extends State<TaskStatistics> {
     _tasks = await getTasks();
     _records = await getRecords();
   }
-
-
 
   Widget _buildPeriodButton(String periodKey) {
     return Text(
@@ -135,10 +134,9 @@ class _TaskStatisticsState extends State<TaskStatistics> {
                             return DropdownMenuItem<String>(
                                 child: _buildPeriodButton(p), value: p);
                           }).toList(),
-                          onChanged: (value) =>
-                              setState(() {
-                                _selectedPeriodKey = value;
-                              }),
+                          onChanged: (value) => setState(() {
+                            _selectedPeriodKey = value;
+                          }),
                         ),
                       ),
                       Padding(
@@ -146,7 +144,8 @@ class _TaskStatisticsState extends State<TaskStatistics> {
                           child: SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              child: Text("Zakończ".toUpperCase(), style: TextStyle(fontSize: 18)),
+                              child: Text("Zakończ".toUpperCase(),
+                                  style: TextStyle(fontSize: 18)),
                               onPressed: () {
                                 if (_formKey.currentState.validate()) {
                                   _formKey.currentState.save();
@@ -164,6 +163,14 @@ class _TaskStatisticsState extends State<TaskStatistics> {
         });
   }
 
+  Widget showChart() {
+    if (_selectedTask != null) {
+      return new TaskChart(records: _records, task: _selectedTask, period: _periods[_selectedPeriodKey],);
+    } else {
+      return Text("Trwa ładowanie danych");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -175,61 +182,77 @@ class _TaskStatisticsState extends State<TaskStatistics> {
                 icon: Icon(Icons.filter_alt), onPressed: _showFiltersDialog)
           ],
         ),
-        body: Container(height: 500, child: TaskChart.withSampleData()));
+        body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Container(
+              padding: EdgeInsets.symmetric(vertical: 24.0),
+              height: 500,
+              child: showChart())
+        ]));
   }
 }
 
 class TaskChart extends StatelessWidget {
-  final List<charts.Series> seriesList;
-  final bool animate;
+  final List<Record> records;
+  final Task task;
+  final Duration period;
 
-  TaskChart(this.seriesList, {this.animate});
+  TaskChart({this.records, this.task, this.period});
 
-  /// Creates a [BarChart] with sample data and no transition.
-  factory TaskChart.withSampleData() {
-    return new TaskChart(
-      _createSampleData(),
-      // Disable animations for image tests.
-      animate: false,
-    );
+  List<charts.Series<DataPair, String>> _buildSeries() {
+    var filteredData = this.records.where((r) => r.taskId == task.id).toList();
+
+    Map dataMap = new Map<DateTime, double>();
+    var now = DateTime.now();
+    for (int i = period.inDays - 1; i >= 0; i--) {
+      var temp = now.subtract(Duration(days: i));
+      dataMap[DateTime(temp.year, temp.month, temp.day)] = 0.0;
+    }
+    filteredData.forEach((e) {
+      var key = DateTime(e.startDate.year, e.startDate.month, e.startDate.day);
+      if (dataMap[key] != null) {
+        dataMap[key] += e.duration.hour;
+        if (e.duration.minute != 0) {
+          dataMap[key] += 60 / e.duration.minute;
+        }
+      }
+    });
+
+    List data = new List<DataPair>();
+    dataMap.forEach((key, value) {
+      data.add(DataPair(DateFormat.Md("pl_PL").format(key), value));
+    });
+
+    return [
+      new charts.Series<DataPair, String>(
+        id: task.name,
+        domainFn: (DataPair dp, _) => dp.date,
+        measureFn: (DataPair dp, _) => dp.accumulatedTime,
+        data: data,
+        seriesColor: charts.ColorUtil.fromDartColor(new Color(task.color)),
+      )
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 100,
+    return
+      Container(
       child: new charts.BarChart(
-        seriesList,
-        animate: animate,
+        _buildSeries(),
+        animate: true,
+        behaviors: [new charts.SeriesLegend(), ],
+        domainAxis: charts.OrdinalAxisSpec(
+          renderSpec: charts.SmallTickRendererSpec(labelRotation: 60),
+        ),
       ),
     );
-  }
-
-  /// Create one series with sample hard coded data.
-  static List<charts.Series<OrdinalSales, String>> _createSampleData() {
-    final data = [
-      new OrdinalSales('2014', 5),
-      new OrdinalSales('2015', 25),
-      new OrdinalSales('2016', 100),
-      new OrdinalSales('2017', 75),
-    ];
-
-    return [
-      new charts.Series<OrdinalSales, String>(
-        id: 'Sales',
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (OrdinalSales sales, _) => sales.year,
-        measureFn: (OrdinalSales sales, _) => sales.sales,
-        data: data,
-      )
-    ];
   }
 }
 
 /// Sample ordinal data type.
-class OrdinalSales {
-  final String year;
-  final int sales;
+class DataPair {
+  final String date;
+  double accumulatedTime = 0.0;
 
-  OrdinalSales(this.year, this.sales);
+  DataPair(this.date, this.accumulatedTime);
 }
