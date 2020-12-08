@@ -52,7 +52,7 @@ class _DemoScreenState extends State<DemoScreen> {
       items: [
         PopupMenuItem(
           child: Text("Delete"),
-          value: "Delete",
+          value: "Usuń",
         ),
       ],
       elevation: 8.0,

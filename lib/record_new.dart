@@ -6,12 +6,14 @@ import 'package:time_management/home_page.dart';
 import 'package:time_management/record_controller.dart';
 
 import 'record_model.dart';
+import 'task_controller.dart';
 import 'task_model.dart';
 
 class RecordNewWidget extends StatefulWidget {
   final List<Task> tasks;
+  final TimeOfDay duration;
 
-  RecordNewWidget({Key key, @required this.tasks}) : super(key: key);
+  RecordNewWidget({Key key, this.tasks, this.duration}) : super(key: key);
 
   @override
   _RecordNewWidgetState createState() => _RecordNewWidgetState();
@@ -23,11 +25,16 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
   final _startController = TextEditingController();
   final _durationController = TextEditingController();
 
+  List _tasks = new List<Task>();
   Task _selectedTask;
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime =
       TimeOfDay.now().replacing(hour: TimeOfDay.now().hour - 1);
   TimeOfDay _selectedDuration = TimeOfDay(hour: 1, minute: 0);
+
+  Future<void> _loadData() async {
+    _tasks = await getTasks();
+  }
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -84,8 +91,20 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
   void initState() {
     super.initState();
 
+    if (widget.tasks != null) {
+      _tasks = widget.tasks;
+    } else {
+      _loadData().then((value) => setState(() {}));
+    }
+
     setState(() {
       _dateController.text = DateFormat.yMMMd("pl_PL").format(_selectedDate);
+      if (widget.duration != null) {
+        _selectedDuration = widget.duration;
+        print(_selectedDuration.toString());
+        _selectedTime = TimeOfDay.fromDateTime(DateTime.now().subtract(Duration(
+            hours: widget.duration.hour, minutes: widget.duration.minute)));
+      }
       _startController.text = formatTime(_selectedTime);
       _durationController.text = formatTime(_selectedDuration);
     });
@@ -128,11 +147,11 @@ class _RecordNewWidgetState extends State<RecordNewWidget> {
               ),
               value: _selectedTask,
               selectedItemBuilder: (BuildContext context) {
-                return widget.tasks.map<Widget>((t) {
+                return _tasks.map<Widget>((t) {
                   return _buildTaskButton(t);
                 }).toList();
               },
-              items: widget.tasks.map((t) {
+              items: _tasks.map((t) {
                 return DropdownMenuItem<Task>(
                     child: _buildTaskButton(t), value: t);
               }).toList(),

@@ -5,6 +5,7 @@ import 'package:time_management/record_controller.dart';
 import 'package:time_management/record_edit.dart';
 import 'package:time_management/record_new.dart';
 import 'menu_drawer.dart';
+import 'stopwatch.dart';
 import "task_model.dart";
 import "task_controller.dart";
 import "record_model.dart";
@@ -31,8 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _reload() {
     initTestData().then((value) => setState(() {
-      _groupedRecords = groupRecords(_records);
-    }));
+          _groupedRecords = groupRecords(_records);
+        }));
   }
 
   Future<void> initTestData() async {
@@ -82,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
       items: [
         PopupMenuItem(
           child: Text("Delete"),
-          value: "Delete",
+          value: "Usuń",
         ),
       ],
       elevation: 8.0,
@@ -127,7 +128,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => RecordEditWidget(tasks: _tasks, editedRecord: record),
+                  builder: (context) =>
+                      RecordEditWidget(tasks: _tasks, editedRecord: record),
                 ));
           },
           onLongPress: () {
@@ -189,7 +191,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Center(child: _buildDatesList()),
       floatingActionButton: FloatingActionButton(
-          onPressed: () {}, child: Icon(Icons.play_arrow, size: 50)),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => StopWatch(),
+                ));
+          },
+          child: Icon(Icons.play_arrow, size: 50)),
     );
   }
 }
